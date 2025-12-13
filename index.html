@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Fundamentals Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .option-card:hover { border-color: #3b82f6; background-color: #eff6ff; }
+        .option-selected { border-color: #2563eb; background-color: #dbeafe; ring: 2px solid #2563eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm p-4 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-600"><i class="fa-brands fa-js-square text-yellow-400 mr-2"></i>JS Quiz</h1>
+            <div id="timer-display" class="hidden font-mono text-lg font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-md border border-gray-300">
+                <i class="fa-regular fa-clock mr-2"></i><span id="time-left">40:00</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 max-w-3xl">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="bg-white p-8 rounded-xl shadow-lg text-center fade-in">
+            <div class="mb-6">
+                <i class="fa-brands fa-js text-9xl text-yellow-400"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-4 text-gray-900">JavaScript Chapters 1-20 Quiz</h2>
+            <p class="text-gray-600 mb-8 text-lg">Test your knowledge of the first 20 chapters of "A Smarter Way to Learn JavaScript".</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <i class="fa-solid fa-list-ol text-blue-500 mb-2 text-xl"></i>
+                    <h3 class="font-bold">40 Questions</h3>
+                    <p class="text-sm text-gray-500">Covers Alerts to Nested Loops</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <i class="fa-solid fa-stopwatch text-blue-500 mb-2 text-xl"></i>
+                    <h3 class="font-bold">40 Minutes</h3>
+                    <p class="text-sm text-gray-500">Time limit to complete</p>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <i class="fa-solid fa-trophy text-blue-500 mb-2 text-xl"></i>
+                    <h3 class="font-bold">Passing Score</h3>
+                    <p class="text-sm text-gray-500">Aim for 70% or higher</p>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-full transition transform hover:scale-105 shadow-md text-lg">
+                Start Quiz
+            </button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden fade-in">
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="text-sm font-semibold text-blue-600 tracking-wider uppercase" id="chapter-tag">Chapter 1</span>
+                    <span class="text-sm text-gray-400 font-mono" id="question-count">1/40</span>
+                </div>
+                
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-8 leading-relaxed">
+                    Question text goes here?
+                </h3>
+
+                <div id="options-container" class="space-y-3">
+                    <!-- Options injected by JS -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center">
+                    <button id="prev-btn" onclick="prevQuestion()" class="hidden px-6 py-2 text-gray-500 hover:text-blue-600 font-medium transition">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Previous
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="ml-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Next <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="hidden fade-in text-center">
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <div id="score-icon" class="text-6xl mb-4"></div>
+                <h2 class="text-3xl font-bold mb-2">Quiz Completed!</h2>
+                <p class="text-gray-500 mb-6">Here is how you performed</p>
+                
+                <div class="flex justify-center items-center space-x-8 mb-8">
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-blue-600" id="final-score">0</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wide">Score</div>
+                    </div>
+                    <div class="w-px h-12 bg-gray-200"></div>
+                    <div class="text-center">
+                        <div class="text-4xl font-bold text-blue-600" id="final-percent">0%</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-wide">Accuracy</div>
+                    </div>
+                </div>
+
+                <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-8 rounded-full transition shadow-md">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Retake Quiz
+                </button>
+            </div>
+
+            <!-- Answer Key -->
+            <div class="text-left">
+                <h3 class="text-xl font-bold mb-4 ml-2">Answer Key</h3>
+                <div id="answer-key" class="space-y-4">
+                    <!-- Results injected here -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t mt-auto py-6">
+        <div class="container mx-auto text-center text-gray-500 text-sm">
+            Based on "A Smarter Way to Learn JavaScript"
+        </div>
+    </footer>
+
+    <script>
+        // --- Quiz Data (40 Questions based on Ch 1-20) ---
+        const quizData = [
+            // Ch 1: Alerts
+            {
+                question: "What is the correct syntax to display an alert box with the message 'Hello'?",
+                options: ["msg('Hello');", "alertBox('Hello');", "alert('Hello');", "alert['Hello'];"],
+                correct: 2,
+                chapter: "Chapter 1: Alerts"
+            },
+            {
+                question: "What happens if you capitalize the 'A' in 'Alert' (e.g., 'Alert(...')?",
+                options: ["It works normally.", "It works only in some browsers.", "It causes an error because JavaScript is case-sensitive.", "It displays a prompt instead."],
+                correct: 2,
+                chapter: "Chapter 1: Alerts"
+            },
+            // Ch 2: Variables for Strings
+            {
+                question: "How do you declare a variable named 'pet' and assign it the string 'dog'?",
+                options: ["variable pet = 'dog';", "v pet = 'dog';", "var pet = 'dog';", "pet = 'dog' (without declaration)"],
+                correct: 2,
+                chapter: "Chapter 2: String Variables"
+            },
+            {
+                question: "Which of the following creates a string variable?",
+                options: ["var x = 100;", "var x = \"100\";", "var x = true;", "var x = undefined;"],
+                correct: 1,
+                chapter: "Chapter 2: String Variables"
+            },
+            // Ch 3: Variables for Numbers
+            {
+                question: "If you write `var weight = 150;` without quotes, how does JavaScript treat 150?",
+                options: ["As a string.", "As a number.", "As a function.", "As an error."],
+                correct: 1,
+                chapter: "Chapter 3: Number Variables"
+            },
+            {
+                question: "What happens if you try to add a number to a string, e.g., `10 + '20'`?",
+                options: ["It results in 30.", "It results in an error.", "It concatenates them to '1020'.", "It subtracts them."],
+                correct: 2,
+                chapter: "Chapter 3: Number Variables"
+            },
+            // Ch 4: Variable Names
+            {
+                question: "Which of the following is a LEGAL variable name?",
+                options: ["2ndPlace", "user name", "user_name", "var"],
+                correct: 2,
+                chapter: "Chapter 4: Variable Names"
+            },
+            {
+                question: "Which naming convention is standard in JavaScript (e.g., `myVariableName`)?",
+                options: ["Snake_case", "kebab-case", "camelCase", "PascalCase"],
+                correct: 2,
+                chapter: "Chapter 4: Variable Names"
+            },
+            // Ch 5: Math (Familiar)
+            {
+                question: "What is the result of `10 % 3`?",
+                options: ["3.33", "3", "1", "10"],
+                correct: 2,
+                chapter: "Chapter 5: Math Operators"
+            },
+            {
+                question: "Which operator is used for multiplication?",
+                options: ["x", "X", "*", "#"],
+                correct: 2,
+                chapter: "Chapter 5: Math Operators"
+            },
+            // Ch 6: Math (Unfamiliar)
+            {
+                question: "What does `num++` do?",
+                options: ["Adds 2 to num", "Adds 1 to num", "Subtracts 1 from num", "Squares num"],
+                correct: 1,
+                chapter: "Chapter 6: Increment/Decrement"
+            },
+            {
+                question: "If `var x = 5;` and `var y = x++;`, what is the value of y?",
+                options: ["5", "6", "4", "Error"],
+                correct: 0,
+                chapter: "Chapter 6: Increment/Decrement"
+            },
+            // Ch 7: Math Ambiguity
+            {
+                question: "How do you ensure addition happens before multiplication in `var x = 2 + 3 * 4;`?",
+                options: ["var x = (2 + 3) * 4;", "var x = 2 + (3 * 4);", "var x = [2 + 3] * 4;", "You cannot change the order."],
+                correct: 0,
+                chapter: "Chapter 7: Math Ambiguity"
+            },
+            {
+                question: "What is the result of `1 + 3 * 2`?",
+                options: ["8", "7", "6", "9"],
+                correct: 1,
+                chapter: "Chapter 7: Math Ambiguity"
+            },
+            // Ch 8: Concatenating Strings
+            {
+                question: "Which operator is used to concatenate (join) strings?",
+                options: ["&", ".", "+", "concat"],
+                correct: 2,
+                chapter: "Chapter 8: Concatenation"
+            },
+            {
+                question: "If `var msg = 'Hello ' + 'World';`, what is the value of msg?",
+                options: ["Hello World", "HelloWorld", "Hello+World", "Error"],
+                correct: 0,
+                chapter: "Chapter 8: Concatenation"
+            },
+            // Ch 9: Prompts
+            {
+                question: "What does `prompt()` return if the user types nothing and clicks OK?",
+                options: ["null", "undefined", "An empty string \"\"", "0"],
+                correct: 2,
+                chapter: "Chapter 9: Prompts"
+            },
+            {
+                question: "Which code asks the user for their age?",
+                options: ["alert('Age?');", "var age = prompt('Enter age');", "var age = confirm('Enter age');", "input('Enter age');"],
+                correct: 1,
+                chapter: "Chapter 9: Prompts"
+            },
+            // Ch 10: if statements
+            {
+                question: "Which is the correct structure for an `if` statement?",
+                options: ["if x = 5 then {}", "if (x === 5) { }", "if {x === 5} ( )", "if x === 5 { }"],
+                correct: 1,
+                chapter: "Chapter 10: if statements"
+            },
+            {
+                question: "The code inside an `if` block executes only if the condition is:",
+                options: ["True", "False", "Undefined", "Null"],
+                correct: 0,
+                chapter: "Chapter 10: if statements"
+            },
+            // Ch 11: Comparison Operators
+            {
+                question: "What is the difference between `==` and `===`?",
+                options: ["No difference.", "`===` compares value and type.", "`==` compares value and type.", "`===` is for assignment."],
+                correct: 1,
+                chapter: "Chapter 11: Comparison Operators"
+            },
+            {
+                question: "Which operator means 'not equal to'?",
+                options: ["<>", "=/=", "!==", "=="],
+                correct: 2,
+                chapter: "Chapter 11: Comparison Operators"
+            },
+            // Ch 12: if...else
+            {
+                question: "What keyword handles the 'false' condition of an `if` statement?",
+                options: ["then", "otherwise", "else", "stop"],
+                correct: 2,
+                chapter: "Chapter 12: if...else"
+            },
+            {
+                question: "How do you chain multiple conditions?",
+                options: ["if ... else ... else", "if ... else if ... else", "if ... then ... otherwise", "check ... check ... else"],
+                correct: 1,
+                chapter: "Chapter 12: if...else"
+            },
+            // Ch 13: Testing sets of conditions
+            {
+                question: "Which operator represents 'AND' (both conditions must be true)?",
+                options: ["||", "&&", "&", "++"],
+                correct: 1,
+                chapter: "Chapter 13: Testing Sets"
+            },
+            {
+                question: "Which operator represents 'OR' (at least one condition must be true)?",
+                options: ["||", "&&", "??", "//"],
+                correct: 0,
+                chapter: "Chapter 13: Testing Sets"
+            },
+            // Ch 14: Nested if
+            {
+                question: "What is a 'nested' if statement?",
+                options: ["An if statement inside another if statement.", "An if statement with no conditions.", "An if statement that runs loops.", "An if statement in a separate file."],
+                correct: 0,
+                chapter: "Chapter 14: Nested if"
+            },
+            {
+                question: "In `if (a) { if (b) { ... } }`, when does the code inside the inner block run?",
+                options: ["If a is true.", "If b is true.", "If both a and b are true.", "If either a or b is true."],
+                correct: 2,
+                chapter: "Chapter 14: Nested if"
+            },
+            // Ch 15: Arrays
+            {
+                question: "How do you define an empty array?",
+                options: ["var arr = {};", "var arr = [];", "var arr = ();", "var arr = new Array;"],
+                correct: 1,
+                chapter: "Chapter 15: Arrays"
+            },
+            {
+                question: "If `var cities = ['NY', 'LA', 'SF'];`, what is `cities[1]`?",
+                options: ["NY", "LA", "SF", "Undefined"],
+                correct: 1,
+                chapter: "Chapter 15: Arrays"
+            },
+            // Ch 16: Array Add/Remove
+            {
+                question: "Which method removes the LAST element of an array?",
+                options: ["shift()", "push()", "pop()", "slice()"],
+                correct: 2,
+                chapter: "Chapter 16: Adding/Removing Elements"
+            },
+            {
+                question: "Which method adds a new element to the END of an array?",
+                options: ["push()", "pop()", "unshift()", "add()"],
+                correct: 0,
+                chapter: "Chapter 16: Adding/Removing Elements"
+            },
+            // Ch 17: Array Shift/Splice
+            {
+                question: "Which method removes the FIRST element of an array?",
+                options: ["pop()", "shift()", "unshift()", "delete()"],
+                correct: 1,
+                chapter: "Chapter 17: Shift, Unshift, Splice"
+            },
+            {
+                question: "What does `splice` do?",
+                options: ["Splits a string.", "Only removes elements.", "Adds or removes elements anywhere in an array.", "Only adds elements."],
+                correct: 2,
+                chapter: "Chapter 17: Shift, Unshift, Splice"
+            },
+            // Ch 18: for loops
+            {
+                question: "Which is the correct syntax for a `for` loop?",
+                options: ["for (i = 0; i < 5)", "for (var i = 0; i < 5; i++)", "loop (var i = 0; i < 5; i++)", "for (var i = 0, i < 5, i++)"],
+                correct: 1,
+                chapter: "Chapter 18: For Loops"
+            },
+            {
+                question: "How many times will `for (var i=0; i<3; i++)` run?",
+                options: ["2 times", "3 times", "4 times", "0 times"],
+                correct: 1,
+                chapter: "Chapter 18: For Loops"
+            },
+            // Ch 19: Loop flags/breaks
+            {
+                question: "What keyword stops a loop immediately?",
+                options: ["stop", "return", "break", "exit"],
+                correct: 2,
+                chapter: "Chapter 19: Loop Flags & Breaks"
+            },
+            {
+                question: "What property tells you how many items are in an array?",
+                options: ["size", "length", "count", "index"],
+                correct: 1,
+                chapter: "Chapter 19: Loop Flags & Breaks"
+            },
+            // Ch 20: Nested loops
+            {
+                question: "In a nested loop, how many times does the inner loop run?",
+                options: ["Once.", "It runs fully for every single iteration of the outer loop.", "It runs only when the outer loop is finished.", "It never runs."],
+                correct: 1,
+                chapter: "Chapter 20: Nested Loops"
+            },
+            {
+                question: "Nested loops are commonly used for:",
+                options: ["Comparing elements in two different arrays.", "Simple arithmetic.", "Declaring variables.", "Closing the browser."],
+                correct: 0,
+                chapter: "Chapter 20: Nested Loops"
+            }
+        ];
+
+        // --- App State ---
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+        let timerInterval;
+        let timeLeft = 40 * 60; // 40 minutes in seconds
+
+        // --- DOM Elements ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const timerDisplay = document.getElementById('timer-display');
+        const timerText = document.getElementById('time-left');
+        const chapterTag = document.getElementById('chapter-tag');
+        const questionCount = document.getElementById('question-count');
+
+        // --- Functions ---
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            timerDisplay.classList.remove('hidden');
+            loadQuestion(0);
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                
+                if (timeLeft <= 0) {
+                    finishQuiz();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion(index) {
+            const data = quizData[index];
+            questionText.textContent = data.question;
+            chapterTag.textContent = data.chapter;
+            questionCount.textContent = `${index + 1}/${quizData.length}`;
+            
+            // Update Progress
+            const progress = ((index) / quizData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+
+            // Generate Options
+            data.options.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = `option-card p-4 border rounded-lg cursor-pointer transition-all flex items-center ${userAnswers[index] === i ? 'option-selected' : 'border-gray-200'}`;
+                div.onclick = () => selectOption(index, i);
+                
+                div.innerHTML = `
+                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${userAnswers[index] === i ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}">
+                        ${userAnswers[index] === i ? '<div class="w-2 h-2 bg-white rounded-full"></div>' : ''}
+                    </div>
+                    <span class="${userAnswers[index] === i ? 'text-blue-800 font-semibold' : 'text-gray-700'}">${opt}</span>
+                `;
+                optionsContainer.appendChild(div);
+            });
+
+            // Button visibility
+            document.getElementById('prev-btn').classList.toggle('hidden', index === 0);
+            const nextBtn = document.getElementById('next-btn');
+            if (index === quizData.length - 1) {
+                nextBtn.innerHTML = 'Finish Quiz <i class="fa-solid fa-flag-checkered ml-2"></i>';
+                nextBtn.onclick = finishQuiz;
+            } else {
+                nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
+                nextBtn.onclick = nextQuestion;
+            }
+        }
+
+        function selectOption(qIndex, oIndex) {
+            userAnswers[qIndex] = oIndex;
+            loadQuestion(qIndex); // Re-render to show selection state
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion(currentQuestion);
+            }
+        }
+
+        function finishQuiz() {
+            clearInterval(timerInterval);
+            quizScreen.classList.add('hidden');
+            timerDisplay.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            // Calculate Score
+            score = 0;
+            const answerKeyContainer = document.getElementById('answer-key');
+            answerKeyContainer.innerHTML = '';
+
+            quizData.forEach((q, index) => {
+                const isCorrect = userAnswers[index] === q.correct;
+                if (isCorrect) score++;
+
+                // Generate Review Item
+                const reviewItem = document.createElement('div');
+                reviewItem.className = `p-4 rounded-lg border-l-4 ${isCorrect ? 'bg-green-50 border-green-500' : 'bg-red-50 border-red-500'}`;
+                
+                const userAnswerText = userAnswers[index] !== null ? q.options[userAnswers[index]] : "No Answer";
+                const correctAnswerText = q.options[q.correct];
+
+                reviewItem.innerHTML = `
+                    <p class="font-bold text-gray-800 text-sm mb-1">${index + 1}. ${q.question}</p>
+                    <div class="text-sm flex flex-col md:flex-row md:justify-between">
+                        <span class="${isCorrect ? 'text-green-700' : 'text-red-600'}">
+                            <i class="fa-solid ${isCorrect ? 'fa-check' : 'fa-xmark'}"></i> You: ${userAnswerText}
+                        </span>
+                        ${!isCorrect ? `<span class="text-green-700 font-semibold">Correct: ${correctAnswerText}</span>` : ''}
+                    </div>
+                `;
+                answerKeyContainer.appendChild(reviewItem);
+            });
+
+            // Update UI Stats
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('final-score').textContent = `${score}/${quizData.length}`;
+            document.getElementById('final-percent').textContent = `${percentage}%`;
+            
+            const iconDiv = document.getElementById('score-icon');
+            if (percentage >= 80) {
+                iconDiv.innerHTML = '<i class="fa-solid fa-face-grin-stars text-green-500"></i>';
+            } else if (percentage >= 60) {
+                iconDiv.innerHTML = '<i class="fa-solid fa-face-smile text-blue-500"></i>';
+            } else {
+                iconDiv.innerHTML = '<i class="fa-solid fa-face-frown-open text-red-500"></i>';
+            }
+        }
+
+    </script>
+</body>
+</html>
