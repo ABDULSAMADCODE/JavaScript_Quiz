@@ -22,7 +22,7 @@
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold text-blue-600"><i class="fa-brands fa-js-square text-yellow-400 mr-2"></i>JS Quiz</h1>
             <div id="timer-display" class="hidden font-mono text-lg font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-md border border-gray-300">
-                <i class="fa-regular fa-clock mr-2"></i><span id="time-left">40:00</span>
+                <i class="fa-regular fa-clock mr-2"></i><span id="time-left">60:00</span>
             </div>
         </div>
     </nav>
@@ -41,12 +41,12 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 text-left">
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <i class="fa-solid fa-list-ol text-blue-500 mb-2 text-xl"></i>
-                    <h3 class="font-bold">40 Questions</h3>
+                    <h3 class="font-bold">60 Questions</h3>
                     <p class="text-sm text-gray-500">Covers Alerts to Nested Loops</p>
                 </div>
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
                     <i class="fa-solid fa-stopwatch text-blue-500 mb-2 text-xl"></i>
-                    <h3 class="font-bold">40 Minutes</h3>
+                    <h3 class="font-bold">60 Minutes</h3>
                     <p class="text-sm text-gray-500">Time limit to complete</p>
                 </div>
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
@@ -71,7 +71,7 @@
             <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-gray-100">
                 <div class="flex justify-between items-start mb-6">
                     <span class="text-sm font-semibold text-blue-600 tracking-wider uppercase" id="chapter-tag">Chapter 1</span>
-                    <span class="text-sm text-gray-400 font-mono" id="question-count">1/40</span>
+                    <span class="text-sm text-gray-400 font-mono" id="question-count">1/60</span>
                 </div>
                 
                 <h3 id="question-text" class="text-xl md:text-2xl font-bold text-gray-800 mb-8 leading-relaxed">
@@ -127,6 +127,30 @@
         </div>
 
     </main>
+    
+    <!-- Focus Loss Warning Modal (Now in English) -->
+    <div id="focus-warning" class="hidden fixed inset-0 bg-yellow-900 bg-opacity-80 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-lg w-full transform transition-all duration-300">
+            <i class="fa-solid fa-triangle-exclamation text-6xl text-yellow-500 mb-4 animate-pulse"></i>
+            <h3 class="text-2xl font-bold mb-4 text-gray-800">Attention: Tab Focus Lost!</h3>
+            <p class="text-gray-700 mb-6">You have switched tabs <span class="font-bold text-lg text-red-500" id="loss-count">0</span> times. If you switch <span class="font-bold text-lg text-blue-600" id="remaining-losses">3</span> more times, the quiz will automatically end.</p>
+            <button onclick="document.getElementById('focus-warning').classList.add('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md">
+                Return to Quiz
+            </button>
+        </div>
+    </div>
+    
+    <!-- Quiz Forced End Modal (Now in English) -->
+    <div id="quiz-forced-end" class="hidden fixed inset-0 bg-red-900 bg-opacity-90 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-lg w-full transform transition-all duration-300">
+            <i class="fa-solid fa-lock text-6xl text-red-600 mb-4"></i>
+            <h3 class="text-2xl font-bold mb-4 text-red-800">Quiz Automatically Ended!</h3>
+            <p class="text-gray-700 mb-6">You have exceeded the allowed limit of tab switches (3). Your quiz has been submitted with the current score.</p>
+            <button onclick="finishQuiz(false)" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-md">
+                View Results
+            </button>
+        </div>
+    </div>
 
     <footer class="bg-white border-t mt-auto py-6">
         <div class="container mx-auto text-center text-gray-500 text-sm">
@@ -135,9 +159,9 @@
     </footer>
 
     <script>
-        // --- Quiz Data (40 Questions based on Ch 1-20) ---
+        // --- Quiz Data (60 Questions based on Ch 1-20) ---
         const quizData = [
-            // Ch 1: Alerts
+            // Chapter 1: Alerts (3 questions)
             {
                 question: "What is the correct syntax to display an alert box with the message 'Hello'?",
                 options: ["msg('Hello');", "alertBox('Hello');", "alert('Hello');", "alert['Hello'];"],
@@ -150,7 +174,14 @@
                 correct: 2,
                 chapter: "Chapter 1: Alerts"
             },
-            // Ch 2: Variables for Strings
+            {
+                question: "Alert boxes are typically used for which purpose in a real-world web application?",
+                options: ["To gather user input like a name or age.", "To display complex HTML content and images.", "To quickly notify the user of a critical, blocking message.", "To perform silent logging in the browser console."],
+                correct: 2,
+                chapter: "Chapter 1: Alerts"
+            },
+
+            // Chapter 2: Variables for Strings (3 questions)
             {
                 question: "How do you declare a variable named 'pet' and assign it the string 'dog'?",
                 options: ["variable pet = 'dog';", "v pet = 'dog';", "var pet = 'dog';", "pet = 'dog' (without declaration)"],
@@ -163,7 +194,14 @@
                 correct: 1,
                 chapter: "Chapter 2: String Variables"
             },
-            // Ch 3: Variables for Numbers
+            {
+                question: "In JavaScript, a string value must be enclosed by which characters?",
+                options: ["Parentheses ( )", "Curly braces { }", "Double or single quotes \" \" or ' '", "Angle brackets < >"],
+                correct: 2,
+                chapter: "Chapter 2: String Variables"
+            },
+
+            // Chapter 3: Variables for Numbers (3 questions)
             {
                 question: "If you write `var weight = 150;` without quotes, how does JavaScript treat 150?",
                 options: ["As a string.", "As a number.", "As a function.", "As an error."],
@@ -176,7 +214,14 @@
                 correct: 2,
                 chapter: "Chapter 3: Number Variables"
             },
-            // Ch 4: Variable Names
+            {
+                question: "How can you convert the number stored in `var num = 42;` into the string \"42\"?",
+                options: ["num.toString();", "String(num);", "num + \"\";", "All of the above."],
+                correct: 3,
+                chapter: "Chapter 3: Number Variables"
+            },
+
+            // Chapter 4: Variable Names (3 questions)
             {
                 question: "Which of the following is a LEGAL variable name?",
                 options: ["2ndPlace", "user name", "user_name", "var"],
@@ -189,7 +234,14 @@
                 correct: 2,
                 chapter: "Chapter 4: Variable Names"
             },
-            // Ch 5: Math (Familiar)
+            {
+                question: "Which of the following is a reserved keyword in JavaScript and cannot be used as a variable name?",
+                options: ["name", "alert", "function", "variable"],
+                correct: 2,
+                chapter: "Chapter 4: Variable Names"
+            },
+
+            // Chapter 5: Math (Familiar) (3 questions)
             {
                 question: "What is the result of `10 % 3`?",
                 options: ["3.33", "3", "1", "10"],
@@ -202,7 +254,14 @@
                 correct: 2,
                 chapter: "Chapter 5: Math Operators"
             },
-            // Ch 6: Math (Unfamiliar)
+            {
+                question: "What is the value of `result` after this calculation: `var result = 5 * 2 + 1;`?",
+                options: ["11", "15", "12", "7"],
+                correct: 0,
+                chapter: "Chapter 5: Math Operators"
+            },
+
+            // Chapter 6: Math (Unfamiliar) (3 questions)
             {
                 question: "What does `num++` do?",
                 options: ["Adds 2 to num", "Adds 1 to num", "Subtracts 1 from num", "Squares num"],
@@ -215,7 +274,14 @@
                 correct: 0,
                 chapter: "Chapter 6: Increment/Decrement"
             },
-            // Ch 7: Math Ambiguity
+            {
+                question: "If `var a = 10;` and `var b = --a;`, what is the value of `b`?",
+                options: ["10", "9", "8", "11"],
+                correct: 1,
+                chapter: "Chapter 6: Increment/Decrement"
+            },
+
+            // Chapter 7: Math Ambiguity (3 questions)
             {
                 question: "How do you ensure addition happens before multiplication in `var x = 2 + 3 * 4;`?",
                 options: ["var x = (2 + 3) * 4;", "var x = 2 + (3 * 4);", "var x = [2 + 3] * 4;", "You cannot change the order."],
@@ -228,7 +294,14 @@
                 correct: 1,
                 chapter: "Chapter 7: Math Ambiguity"
             },
-            // Ch 8: Concatenating Strings
+            {
+                question: "According to standard operator precedence, which operation is performed first in the absence of parentheses?",
+                options: ["Addition (+)", "Subtraction (-)", "Multiplication (*)", "Assignment (=)"],
+                correct: 2,
+                chapter: "Chapter 7: Math Ambiguity"
+            },
+
+            // Chapter 8: Concatenating Strings (3 questions)
             {
                 question: "Which operator is used to concatenate (join) strings?",
                 options: ["&", ".", "+", "concat"],
@@ -241,7 +314,14 @@
                 correct: 0,
                 chapter: "Chapter 8: Concatenation"
             },
-            // Ch 9: Prompts
+            {
+                question: "If `var name = 'John';` and you run `var greeting = 'Hi, ' + name + '!';`, what is the value of `greeting`?",
+                options: ["Hi, John!", "Hi, name!", "Hi, John", "Error"],
+                correct: 0,
+                chapter: "Chapter 8: Concatenation"
+            },
+
+            // Chapter 9: Prompts (3 questions)
             {
                 question: "What does `prompt()` return if the user types nothing and clicks OK?",
                 options: ["null", "undefined", "An empty string \"\"", "0"],
@@ -254,7 +334,14 @@
                 correct: 1,
                 chapter: "Chapter 9: Prompts"
             },
-            // Ch 10: if statements
+            {
+                question: "By default, what is the data type of the value returned by the `prompt()` function?",
+                options: ["Number", "Boolean", "String", "Object"],
+                correct: 2,
+                chapter: "Chapter 9: Prompts"
+            },
+
+            // Chapter 10: if statements (3 questions)
             {
                 question: "Which is the correct structure for an `if` statement?",
                 options: ["if x = 5 then {}", "if (x === 5) { }", "if {x === 5} ( )", "if x === 5 { }"],
@@ -267,7 +354,14 @@
                 correct: 0,
                 chapter: "Chapter 10: if statements"
             },
-            // Ch 11: Comparison Operators
+            {
+                question: "Using a single equals sign (`=`) inside an `if` condition (e.g., `if (x = 5)`) will result in:",
+                options: ["A comparison that returns true.", "A comparison that returns false.", "An assignment that sets the value, and the condition evaluates to that value.", "A syntax error."],
+                correct: 2,
+                chapter: "Chapter 10: if statements"
+            },
+
+            // Chapter 11: Comparison Operators (3 questions)
             {
                 question: "What is the difference between `==` and `===`?",
                 options: ["No difference.", "`===` compares value and type.", "`==` compares value and type.", "`===` is for assignment."],
@@ -275,12 +369,19 @@
                 chapter: "Chapter 11: Comparison Operators"
             },
             {
-                question: "Which operator means 'not equal to'?",
+                question: "Which operator means 'strictly not equal to' (value or type)?",
                 options: ["<>", "=/=", "!==", "=="],
                 correct: 2,
                 chapter: "Chapter 11: Comparison Operators"
             },
-            // Ch 12: if...else
+            {
+                question: "The expression `5 != '5'` evaluates to which boolean value?",
+                options: ["true", "false", "undefined", "error"],
+                correct: 1,
+                chapter: "Chapter 11: Comparison Operators"
+            },
+
+            // Chapter 12: if...else (3 questions)
             {
                 question: "What keyword handles the 'false' condition of an `if` statement?",
                 options: ["then", "otherwise", "else", "stop"],
@@ -288,25 +389,39 @@
                 chapter: "Chapter 12: if...else"
             },
             {
-                question: "How do you chain multiple conditions?",
+                question: "How do you chain multiple conditions in sequence?",
                 options: ["if ... else ... else", "if ... else if ... else", "if ... then ... otherwise", "check ... check ... else"],
                 correct: 1,
                 chapter: "Chapter 12: if...else"
             },
-            // Ch 13: Testing sets of conditions
             {
-                question: "Which operator represents 'AND' (both conditions must be true)?",
+                question: "If an `if` condition is false, and there is an `else if` block, when does the `else if` block's condition get checked?",
+                options: ["Always, regardless of the `if` condition.", "Only if the `if` condition is false.", "Only if both the `if` and final `else` are false.", "Never, the program moves to the final `else`."],
+                correct: 1,
+                chapter: "Chapter 12: if...else"
+            },
+
+            // Chapter 13: Testing sets of conditions (3 questions)
+            {
+                question: "Which operator represents logical 'AND' (both conditions must be true)?",
                 options: ["||", "&&", "&", "++"],
                 correct: 1,
                 chapter: "Chapter 13: Testing Sets"
             },
             {
-                question: "Which operator represents 'OR' (at least one condition must be true)?",
+                question: "Which operator represents logical 'OR' (at least one condition must be true)?",
                 options: ["||", "&&", "??", "//"],
                 correct: 0,
                 chapter: "Chapter 13: Testing Sets"
             },
-            // Ch 14: Nested if
+            {
+                question: "The logical NOT operator (`!`) does what to a boolean condition?",
+                options: ["It converts it to a string.", "It negates (reverses) the boolean value.", "It converts it to a number.", "It checks for strict equality."],
+                correct: 1,
+                chapter: "Chapter 13: Testing Sets"
+            },
+
+            // Chapter 14: Nested if (3 questions)
             {
                 question: "What is a 'nested' if statement?",
                 options: ["An if statement inside another if statement.", "An if statement with no conditions.", "An if statement that runs loops.", "An if statement in a separate file."],
@@ -319,9 +434,16 @@
                 correct: 2,
                 chapter: "Chapter 14: Nested if"
             },
-            // Ch 15: Arrays
             {
-                question: "How do you define an empty array?",
+                question: "If the outer `if` condition fails in a nested structure, what happens to the inner `if` condition?",
+                options: ["The inner condition is still checked.", "The inner condition is executed by itself.", "The inner condition is never reached or executed.", "The program throws an error."],
+                correct: 2,
+                chapter: "Chapter 14: Nested if"
+            },
+
+            // Chapter 15: Arrays (3 questions)
+            {
+                question: "How do you define an empty array using literal notation?",
                 options: ["var arr = {};", "var arr = [];", "var arr = ();", "var arr = new Array;"],
                 correct: 1,
                 chapter: "Chapter 15: Arrays"
@@ -332,7 +454,14 @@
                 correct: 1,
                 chapter: "Chapter 15: Arrays"
             },
-            // Ch 16: Array Add/Remove
+            {
+                question: "What index number corresponds to the *first* element in any JavaScript array?",
+                options: ["0", "1", "Array.first", "Array.start"],
+                correct: 0,
+                chapter: "Chapter 15: Arrays"
+            },
+
+            // Chapter 16: Array Add/Remove (3 questions)
             {
                 question: "Which method removes the LAST element of an array?",
                 options: ["shift()", "push()", "pop()", "slice()"],
@@ -345,7 +474,14 @@
                 correct: 0,
                 chapter: "Chapter 16: Adding/Removing Elements"
             },
-            // Ch 17: Array Shift/Splice
+            {
+                question: "If `arr = ['A', 'B', 'C'];`, after `arr.pop();` what will `arr` contain?",
+                options: ["['A', 'B']", "['B', 'C']", "['A', 'C']", "['C']"],
+                correct: 0,
+                chapter: "Chapter 16: Adding/Removing Elements"
+            },
+
+            // Chapter 17: Array Shift/Splice (3 questions)
             {
                 question: "Which method removes the FIRST element of an array?",
                 options: ["pop()", "shift()", "unshift()", "delete()"],
@@ -353,12 +489,19 @@
                 chapter: "Chapter 17: Shift, Unshift, Splice"
             },
             {
-                question: "What does `splice` do?",
-                options: ["Splits a string.", "Only removes elements.", "Adds or removes elements anywhere in an array.", "Only adds elements."],
+                question: "What does `splice` primarily allow you to do?",
+                options: ["Only remove elements.", "Only add elements.", "Add or remove elements anywhere in an array.", "Create a new array from a portion of an existing one."],
                 correct: 2,
                 chapter: "Chapter 17: Shift, Unshift, Splice"
             },
-            // Ch 18: for loops
+            {
+                question: "Which method adds one or more elements to the *beginning* of an array?",
+                options: ["push()", "shift()", "unshift()", "appendStart()"],
+                correct: 2,
+                chapter: "Chapter 17: Shift, Unshift, Splice"
+            },
+
+            // Chapter 18: for loops (3 questions)
             {
                 question: "Which is the correct syntax for a `for` loop?",
                 options: ["for (i = 0; i < 5)", "for (var i = 0; i < 5; i++)", "loop (var i = 0; i < 5; i++)", "for (var i = 0, i < 5, i++)"],
@@ -371,9 +514,16 @@
                 correct: 1,
                 chapter: "Chapter 18: For Loops"
             },
-            // Ch 19: Loop flags/breaks
             {
-                question: "What keyword stops a loop immediately?",
+                question: "If you want to iterate through an array named `items`, what condition should you typically use in the loop structure?",
+                options: ["i <= 10", "i === items.length", "i < items.length", "i = 0"],
+                correct: 2,
+                chapter: "Chapter 18: For Loops"
+            },
+
+            // Chapter 19: Loop flags/breaks (3 questions)
+            {
+                question: "What keyword stops a loop immediately and continues execution after the loop?",
                 options: ["stop", "return", "break", "exit"],
                 correct: 2,
                 chapter: "Chapter 19: Loop Flags & Breaks"
@@ -384,9 +534,16 @@
                 correct: 1,
                 chapter: "Chapter 19: Loop Flags & Breaks"
             },
-            // Ch 20: Nested loops
             {
-                question: "In a nested loop, how many times does the inner loop run?",
+                question: "Which keyword is used to skip the current iteration of a loop and move to the next iteration?",
+                options: ["break", "next", "continue", "skip"],
+                correct: 2,
+                chapter: "Chapter 19: Loop Flags & Breaks"
+            },
+
+            // Chapter 20: Nested loops (3 questions)
+            {
+                question: "In a nested loop, how many times does the inner loop run in total?",
                 options: ["Once.", "It runs fully for every single iteration of the outer loop.", "It runs only when the outer loop is finished.", "It never runs."],
                 correct: 1,
                 chapter: "Chapter 20: Nested Loops"
@@ -396,6 +553,12 @@
                 options: ["Comparing elements in two different arrays.", "Simple arithmetic.", "Declaring variables.", "Closing the browser."],
                 correct: 0,
                 chapter: "Chapter 20: Nested Loops"
+            },
+            {
+                question: "If the outer loop runs 5 times and the inner loop runs 3 times, how many times will the code inside the inner loop execute?",
+                options: ["8 times", "3 times", "15 times", "5 times"],
+                correct: 2,
+                chapter: "Chapter 20: Nested Loops"
             }
         ];
 
@@ -404,7 +567,12 @@
         let score = 0;
         let userAnswers = new Array(quizData.length).fill(null);
         let timerInterval;
-        let timeLeft = 40 * 60; // 40 minutes in seconds
+        let timeLeft = 60 * 60; // 60 minutes in seconds
+        
+        // Focus Loss Tracking
+        let focusLossCount = 0;
+        const maxFocusLosses = 3;
+        let isQuizActive = false; 
 
         // --- DOM Elements ---
         const startScreen = document.getElementById('start-screen');
@@ -420,12 +588,45 @@
 
         // --- Functions ---
 
+        // Removed the goFullscreen function as it causes errors in the iframe environment.
+
+        // Function to setup Focus Monitoring
+        function setupFocusMonitoring() {
+            // Monitor when the tab loses focus (user switches tabs or minimizes)
+            window.addEventListener('blur', handleFocusLoss);
+        }
+
+        // Function to handle Focus Loss
+        function handleFocusLoss() {
+            if (!isQuizActive) return; // Only monitor when quiz is running
+
+            focusLossCount++;
+            
+            if (focusLossCount >= maxFocusLosses) {
+                // Limit reached - Force finish
+                window.removeEventListener('blur', handleFocusLoss);
+                finishQuiz(true); // Pass true to indicate forced submission
+                // Show the forced end modal
+                document.getElementById('quiz-forced-end').classList.remove('hidden');
+            } else {
+                // Warn the user
+                document.getElementById('loss-count').textContent = focusLossCount;
+                document.getElementById('remaining-losses').textContent = maxFocusLosses - focusLossCount;
+                document.getElementById('focus-warning').classList.remove('hidden');
+            }
+        }
+
         function startQuiz() {
             startScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
             timerDisplay.classList.remove('hidden');
+            
+            // Removed goFullscreen() call to fix the permissions error.
+            
             loadQuestion(0);
             startTimer();
+            isQuizActive = true; // Set quiz active
+            setupFocusMonitoring(); // Start monitoring
         }
 
         function startTimer() {
@@ -436,19 +637,20 @@
                 timerText.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
                 
                 if (timeLeft <= 0) {
-                    finishQuiz();
+                    finishQuiz(false);
                 }
             }, 1000);
         }
 
         function loadQuestion(index) {
+            currentQuestion = index; // Update currentQuestion index
             const data = quizData[index];
             questionText.textContent = data.question;
             chapterTag.textContent = data.chapter;
             questionCount.textContent = `${index + 1}/${quizData.length}`;
             
             // Update Progress
-            const progress = ((index) / quizData.length) * 100;
+            const progress = ((index + 1) / quizData.length) * 100;
             progressBar.style.width = `${progress}%`;
 
             // Clear previous options
@@ -456,15 +658,16 @@
 
             // Generate Options
             data.options.forEach((opt, i) => {
+                const isSelected = userAnswers[index] === i;
                 const div = document.createElement('div');
-                div.className = `option-card p-4 border rounded-lg cursor-pointer transition-all flex items-center ${userAnswers[index] === i ? 'option-selected' : 'border-gray-200'}`;
+                div.className = `option-card p-4 border rounded-lg cursor-pointer transition-all flex items-center ${isSelected ? 'option-selected' : 'border-gray-200'}`;
                 div.onclick = () => selectOption(index, i);
                 
                 div.innerHTML = `
-                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${userAnswers[index] === i ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}">
-                        ${userAnswers[index] === i ? '<div class="w-2 h-2 bg-white rounded-full"></div>' : ''}
+                    <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}">
+                        ${isSelected ? '<div class="w-2 h-2 bg-white rounded-full"></div>' : ''}
                     </div>
-                    <span class="${userAnswers[index] === i ? 'text-blue-800 font-semibold' : 'text-gray-700'}">${opt}</span>
+                    <span class="${isSelected ? 'text-blue-800 font-semibold' : 'text-gray-700'}">${opt}</span>
                 `;
                 optionsContainer.appendChild(div);
             });
@@ -474,7 +677,7 @@
             const nextBtn = document.getElementById('next-btn');
             if (index === quizData.length - 1) {
                 nextBtn.innerHTML = 'Finish Quiz <i class="fa-solid fa-flag-checkered ml-2"></i>';
-                nextBtn.onclick = finishQuiz;
+                nextBtn.onclick = () => finishQuiz(false); 
             } else {
                 nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
                 nextBtn.onclick = nextQuestion;
@@ -488,22 +691,28 @@
 
         function nextQuestion() {
             if (currentQuestion < quizData.length - 1) {
-                currentQuestion++;
-                loadQuestion(currentQuestion);
+                loadQuestion(currentQuestion + 1);
             }
         }
 
         function prevQuestion() {
             if (currentQuestion > 0) {
-                currentQuestion--;
-                loadQuestion(currentQuestion);
+                loadQuestion(currentQuestion - 1);
             }
         }
 
-        function finishQuiz() {
+        function finishQuiz(isForced = false) { 
             clearInterval(timerInterval);
+            isQuizActive = false;
+            window.removeEventListener('blur', handleFocusLoss); // Stop monitoring
+            
+            // Hide all quiz/modal screens
             quizScreen.classList.add('hidden');
             timerDisplay.classList.add('hidden');
+            document.getElementById('focus-warning').classList.add('hidden');
+            document.getElementById('quiz-forced-end').classList.add('hidden');
+
+            // Show result screen
             resultScreen.classList.remove('hidden');
 
             // Calculate Score
